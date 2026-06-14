@@ -113,6 +113,16 @@ export class SSHSessionDO {
     config: SSHConnectionConfig
   ): Promise<void> {
     try {
+      const BLOCKED_PORTS = [80, 443, 25, 465, 587, 3306, 6379, 27017, 11211];
+      if (BLOCKED_PORTS.includes(config.port)) {
+        throw new Error(`端口 ${config.port} 存在安全风险，已被禁止连接`);
+      }
+
+      const isPrivateIP = /^(127\.|10\.|172\.(1[6-9]|2[0-9]|3[0-1])\.|192\.168\.)/.test(config.host);
+      const isLocalhost = config.host.toLowerCase() === 'localhost';
+      if (isPrivateIP || isLocalhost) {
+        throw new Error('禁止连接内网或本地回环地址 (SSRF 防护)');
+      }
       const { connect } = await import('cloudflare:sockets');
       const socket = connect({ hostname: config.host, port: config.port });
 
