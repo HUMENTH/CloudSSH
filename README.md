@@ -69,7 +69,6 @@
 - **全功能极客终端**：基于 `@xterm/xterm` 与 `@xterm/addon-webgl` 硬件加速渲染引擎，保证海量日志输出顺滑不卡顿。
 - **个性化 UI**：提供 Cyberpunk、Glacier、Gruvbox 等经典终端主题一键切换，支持移动端适配。
 - **原生文件传输**：集成 zmodem.js，只需在终端中执行 `rz` / `sz` 命令，即可在浏览器直接与服务器双向拖放/下载文件。
-- **智能断线重连 (Roaming)**：利用 Durable Objects 留存特性，当网络波动或切换 WiFi 造成 WebSocket 断开时，15 秒内静默重连，无需重新验证密码。
 
 <a id="architecture"></a>
 ## 架构说明

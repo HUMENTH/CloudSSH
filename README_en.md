@@ -69,7 +69,6 @@
 - **Geek Terminal Experience**: Powered by `@xterm/xterm` and the `@xterm/addon-webgl` hardware acceleration rendering engine, ensuring silky smooth scrolling even with massive log outputs.
 - **Customizable UI**: Switch seamlessly between classic terminal themes like Cyberpunk, Glacier, and Gruvbox, fully optimized for mobile devices.
 - **Native File Transfer**: Integrated with `zmodem.js`. Just run `rz` or `sz` commands in the terminal to easily upload/download files via drag & drop directly in the browser.
-- **Smart Reconnection (Roaming)**: Leverages Durable Objects' memory retention to silently reconnect and restore your session within 15 seconds if your WebSocket disconnects due to network fluctuations or Wi-Fi switching, without needing to re-enter your password.
 
 <a id="architecture"></a>
 ## Architecture

@@ -44,11 +44,6 @@ export class SSHTerminal {
   private webglAddon!: WebglAddon;
   private ws: WebSocket | null = null;
   private container: HTMLElement;
-  private config: SSHConnectionConfig | null = null;
-  private roamId: string | null = null;
-  private reconnecting: boolean = false;
-  private reconnectAttempts: number = 0;
-  private maxReconnectAttempts: number = 5;
 
   constructor(containerId: string) {
     this.container = document.getElementById(containerId)!;
@@ -110,30 +105,7 @@ export class SSHTerminal {
     this.terminal.writeln('');
   }
 
-  private attemptReconnect(): void {
-    if (this.reconnectAttempts >= this.maxReconnectAttempts || !this.roamId || !this.config) {
-      this.terminal.writeln('\x1b[31m[!] 连接已断开，无法恢复。\x1b[0m');
-      document.getElementById('status-text')!.innerHTML = '<span class="w-2 h-2 bg-[#ea6c73] inline-block"></span> STATUS: DISCONNECTED';
-      return;
-    }
-
-    this.reconnecting = true;
-    this.reconnectAttempts++;
-    this.terminal.writeln(`\x1b[33m[*] 正在尝试恢复连接 (${this.reconnectAttempts}/${this.maxReconnectAttempts})...\x1b[0m`);
-    
-    // Slight delay before reconnecting
-    setTimeout(() => {
-      this.connect(this.config!, this.roamId!);
-    }, 2000);
-  }
-
-  async connect(config: SSHConnectionConfig, withRoamId?: string): Promise<void> {
-    if (!withRoamId) {
-      this.config = config;
-      this.reconnectAttempts = 0;
-      this.roamId = null;
-    }
-
+  async connect(config: SSHConnectionConfig): Promise<void> {
     const wsUrl = new URL(window.location.href);
     wsUrl.protocol = wsUrl.protocol === 'https:' ? 'wss:' : 'ws:';
     wsUrl.pathname = '/api/ssh';
@@ -142,44 +114,26 @@ export class SSHTerminal {
       this.ws = new WebSocket(wsUrl.toString());
 
       this.ws.onopen = () => {
-        if (!withRoamId) {
-          this.terminal.writeln('\x1b[32m[+] WebSocket connected, sending credentials...\x1b[0m');
-        }
-        
-        const payload = withRoamId 
-          ? { roamId: withRoamId }
-          : {
-              host: config.host,
-              port: config.port,
-              username: config.username,
-              password: config.password,
-              authMethod: config.authMethod,
-              privateKey: config.privateKey,
-            };
-            
-        this.ws?.send(JSON.stringify(payload));
-        
-        if (withRoamId) {
-          this.reconnectAttempts = 0;
-          this.reconnecting = false;
-        }
+        this.terminal.writeln('\x1b[32m[+] WebSocket connected, sending credentials...\x1b[0m');
+        this.ws?.send(JSON.stringify({
+          host: config.host,
+          port: config.port,
+          username: config.username,
+          password: config.password,
+          authMethod: config.authMethod,
+          privateKey: config.privateKey,
+        }));
         
         resolve();
       };
 
-        this.ws.onerror = () => {
-        if (!this.reconnecting) {
-          reject(new Error('WebSocket connection failed'));
-        }
+      this.ws.onerror = () => {
+        reject(new Error('WebSocket connection failed'));
       };
 
       this.ws.onclose = () => {
-        if (!this.reconnecting && this.roamId) {
-          this.attemptReconnect();
-        } else if (!this.reconnecting) {
-          this.terminal.writeln('\x1b[31m[-] 连接已关闭\x1b[0m');
-          document.getElementById('status-text')!.innerHTML = '<span class="w-2 h-2 bg-[#353534] inline-block"></span> STATUS: OFFLINE';
-        }
+        this.terminal.writeln('\x1b[31m[-] 连接已关闭\x1b[0m');
+        document.getElementById('status-text')!.innerHTML = '<span class="w-2 h-2 bg-[#353534] inline-block"></span> STATUS: OFFLINE';
       };
 
       // Zmodem support
@@ -197,12 +151,9 @@ export class SSHTerminal {
           try {
             const msg = JSON.parse(event.data);
             switch (msg.type) {
-              case 'roamId':
-                this.roamId = msg.roamId;
-                break;
               case 'status':
                 this.terminal.writeln(`\x1b[32m[*] ${msg.message}\x1b[0m`);
-                if (msg.message === '认证成功' || msg.message === '会话已恢复') {
+                if (msg.message === '认证成功') {
                   document.getElementById('status-text')!.innerHTML = '<span class="w-2 h-2 bg-[#4af626] inline-block animate-pulse"></span> STATUS: ONLINE';
                 }
                 break;

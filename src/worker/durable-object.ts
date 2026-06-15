@@ -37,8 +37,6 @@ export class SSHSessionDO {
   private state: DurableObjectState;
   private env: Env;
   private sessions: Map<WebSocket, SSHSession> = new Map();
-  private activeSessionsByRoamId: Map<string, SSHSession> = new Map();
-  private roamTimeouts: Map<string, ReturnType<typeof setTimeout>> = new Map();
   private _pendingTimeouts: Map<WebSocket, ReturnType<typeof setTimeout>> = new Map();
 
   constructor(state: DurableObjectState, env: Env) {
@@ -85,7 +83,7 @@ export class SSHSessionDO {
       return;
     }
 
-    // This is the first message (credentials or roam reconnect)
+    // This is the first message (credentials)
     const timeout = this._pendingTimeouts.get(ws);
     if (timeout) {
       clearTimeout(timeout);
@@ -93,23 +91,7 @@ export class SSHSessionDO {
     }
 
     try {
-      const config = JSON.parse(message as string);
-
-      if (config.roamId) {
-        // Attempt to resume session
-        const existingSession = this.activeSessionsByRoamId.get(config.roamId);
-        if (existingSession) {
-          const roamTimeout = this.roamTimeouts.get(config.roamId);
-          if (roamTimeout) {
-            clearTimeout(roamTimeout);
-            this.roamTimeouts.delete(config.roamId);
-          }
-          this.sessions.set(ws, existingSession);
-          existingSession.updateWebSocket(ws);
-          return;
-        }
-        // If roam session not found, fall back to new connection if config provided
-      }
+      const config = JSON.parse(message as string) as SSHConnectionConfig;
 
       if (!config.host || !config.username || (!config.password && !config.privateKey)) {
         ws.send(JSON.stringify({ type: 'error', message: 'Missing credentials' }));
@@ -117,7 +99,7 @@ export class SSHSessionDO {
         return;
       }
 
-      await this.initSSHSession(ws, config as SSHConnectionConfig);
+      await this.initSSHSession(ws, config);
     } catch (e) {
       ws.send(JSON.stringify({ type: 'error', message: 'Invalid credentials format' }));
       ws.close(1011, 'Invalid format');
@@ -128,15 +110,8 @@ export class SSHSessionDO {
   async webSocketClose(ws: WebSocket, code: number, reason: string, wasClean: boolean): Promise<void> {
     const session = this.sessions.get(ws);
     if (session) {
+      session.close();
       this.sessions.delete(ws);
-      // Wait 15s for roam reconnect before closing session
-      const roamId = session.roamId;
-      const timeout = setTimeout(() => {
-        session.close();
-        this.activeSessionsByRoamId.delete(roamId);
-        this.roamTimeouts.delete(roamId);
-      }, 15000);
-      this.roamTimeouts.set(roamId, timeout);
     }
     const timeout = this._pendingTimeouts.get(ws);
     if (timeout) {
@@ -171,7 +146,6 @@ export class SSHSessionDO {
 
       const session = new SSHSession(ws, socket, config);
       this.sessions.set(ws, session);
-      this.activeSessionsByRoamId.set(session.roamId, session);
 
       await session.startHandshake();
 

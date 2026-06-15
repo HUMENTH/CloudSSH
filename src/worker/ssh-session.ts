@@ -70,8 +70,6 @@ export class SSHSession {
   private negotiatedCipherC2S: string = 'aes256-gcm@openssh.com';
   private negotiatedCipherS2C: string = 'aes256-gcm@openssh.com';
 
-  public readonly roamId: string;
-
   constructor(
     ws: WebSocket,
     socket: any,
@@ -80,23 +78,10 @@ export class SSHSession {
     this.ws = ws;
     this.socket = socket;
     this.config = config;
-    this.roamId = crypto.randomUUID();
 
     this.transport = new SSHTransport();
     this.packetParser = new SSHPacketParser();
     this.channel = new SSHChannel();
-  }
-
-  updateWebSocket(ws: WebSocket): void {
-    this.ws = ws;
-    try {
-      this.ws.send(JSON.stringify({ type: 'roamId', roamId: this.roamId }));
-    } catch {}
-    if (this.state === 'ready') {
-      try {
-        this.ws.send(JSON.stringify({ type: 'status', message: '会话已恢复' }));
-      } catch {}
-    }
   }
 
   async startHandshake(): Promise<void> {
