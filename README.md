@@ -152,9 +152,10 @@ flowchart TB
 #### 方式一：通过 GitHub 绑定自动部署（推荐）
 
 1. **Fork 本仓库** 到你的 GitHub 账号。
-2. **修改域名**：在进行部署前，请先将 `wrangler.toml` 中的自定义域名改成你自己的域名（要求：域名需要先在 Cloudflare 中完成注册或接入）。
-3. **一键部署**：登录 Cloudflare，进入 Workers & Pages 绑定你的 GitHub 账号，选择刚才 Fork 的仓库进行应用创建。
-4. **填写构建命令**：在部署设置中，请务必将“构建命令”（Build command）填写为 `pnpm run build:frontend`，然后点击保存并部署（无需填写构建输出目录）。
+2. **一键部署**：登录 Cloudflare，进入 Workers & Pages 绑定你的 GitHub 账号，选择刚才 Fork 的仓库进行应用创建。
+3. **填写构建命令**：在部署设置中，请务必将"构建命令"（Build command）填写为 `pnpm run build:frontend`，然后点击保存并部署（无需填写构建输出目录）。
+4. **访问应用**：部署成功后，可通过默认域名 `https://cloudssh.<你的子域>.workers.dev` 访问。
+5. **绑定自定义域名**（可选）：在 Cloudflare Dashboard 的 Workers 设置中，进入 "Triggers" → "Custom Domains" 添加你的域名。
 
 #### 方式二：本地命令行部署
 
@@ -182,17 +183,17 @@ flowchart TB
 
 部署完成后，Wrangler 会输出你的 Worker URL。打开浏览器访问该 URL，即可开始使用你的 Web SSH 终端。
 
+5. **绑定自定义域名**（可选）：在 Cloudflare Dashboard 的 Workers 设置中，进入 "Triggers" → "Custom Domains" 添加你的域名。
+
 #### 可选：配置 Turnstile 人机验证
 
 为防止恶意机器人滥用，建议启用 Cloudflare Turnstile 验证：
 
 1. **创建 Turnstile Widget**：登录 [Cloudflare Dashboard](https://dash.cloudflare.com/)，进入 Turnstile 页面创建一个新的 Widget。
 2. **获取密钥**：创建后会获得一个 **Site Key**（公开）和一个 **Secret Key**（保密）。
-3. **配置环境变量**：
-   - **方式一部署**：在 Cloudflare Dashboard 的 Workers 设置中，添加以下环境变量：
-     - `TURNSTILE_SECRET` = 你的 Secret Key
-     - `TURNSTILE_SITEKEY` = 你的 Site Key
-   - **方式二部署**：取消 `wrangler.toml` 中 `TURNSTILE_SECRET` 和 `TURNSTILE_SITEKEY` 的注释，填入对应密钥。
+3. **配置环境变量**：在 Cloudflare Dashboard 的 Workers 设置中，进入 "Settings" → "Variables and Secrets"，添加以下环境变量：
+   - `TURNSTILE_SECRET` = 你的 Secret Key（类型选择 Secret）
+   - `TURNSTILE_SITEKEY` = 你的 Site Key（类型选择 Text）
 4. **重新部署**：运行部署命令使配置生效。
 
 > **说明**：Turnstile 验证为会话级别，用户通过验证后当前会话内所有功能可用，关闭浏览器后需重新验证。
@@ -208,21 +209,12 @@ flowchart TB
    - **Authorization callback URL**：`https://your-domain.com/api/auth/callback`
    - 创建后获得 **Client ID**，点击 **Generate a new client secret** 生成 **Client Secret**（仅显示一次，请立即保存）
 
-2. **配置环境变量**：
-   - **方式一部署**：在 Cloudflare Dashboard 的 Workers 设置中，添加以下环境变量：
-     - `GITHUB_CLIENT_ID` = 你的 Client ID
-     - `BASE_URL` = `https://your-domain.com`（你的部署域名）
-   - **方式二部署**：取消 `wrangler.toml` 中 `GITHUB_CLIENT_ID` 和 `BASE_URL` 的注释，填入对应值。
+2. **配置环境变量**：在 Cloudflare Dashboard 的 Workers 设置中，进入 "Settings" → "Variables and Secrets"，添加以下环境变量：
+   - `GITHUB_CLIENT_ID` = 你的 Client ID（类型选择 Text）
+   - `BASE_URL` = `https://your-domain.com`（你的部署域名，类型选择 Text）
+   - `GITHUB_CLIENT_SECRET` = 你的 Client Secret（类型选择 Secret）
 
-3. **设置 Secrets（敏感密钥）**：
-   - 部署项目后，进入 Cloudflare Dashboard → 你的 Worker 项目 (`cloudssh`) → **Settings (设置)** → **Variables and Secrets (变量和机密)**。
-   - 点击 **Add (添加)** 环境变量：
-     - **Type (类型)**：选择 **Secret (机密)**（非常重要，不要选 Text）
-     - **变量名**：`GITHUB_CLIENT_SECRET`
-     - **值**：粘贴你获取到的 Client Secret
-   - 随后点击 **Save and deploy (保存并部署)**。
-
-4. **重新部署**：如果你是刚刚修改了环境变量，且是首次启用该功能，请务必删除旧版并全新部署以初始化数据库。
+3. **重新部署**：如果你是刚刚修改了环境变量，且是首次启用该功能，请务必删除旧版并全新部署以初始化数据库。
 
 > **说明**：服务器凭据（密码/私钥）在数据库中使用 AES-256-GCM 加密存储，本地加密密钥将自动生成并安全地存储在数据库中（也可在环境变量中手动设置 `SESSION_SECRET` 来指定）。连接时凭据不经过前端，通过 one-time-token 机制安全传递。
 
@@ -296,4 +288,3 @@ CloudSSH/
    <img alt="Star History Chart" src="https://api.star-history.com/chart?repos=newbietan/CloudSSH&type=date&legend=top-left" />
  </picture>
 </a>
-

@@ -152,9 +152,10 @@ This project implements a complete SSH-2.0 protocol stack:
 #### Method 1: Deploy via GitHub Integration (Recommended)
 
 1. **Fork this repository** to your GitHub account.
-2. **Configure Domain**: Before deploying, you must modify the custom domain in `wrangler.toml` to your own domain (Note: The domain must be registered or active in Cloudflare beforehand).
-3. **Setup Deployment**: Log in to the Cloudflare dashboard, go to Workers & Pages to connect your GitHub account, and select the forked repository.
-4. **Build Command**: During the deployment configuration, make sure to enter `pnpm run build:frontend` as the Build command, then deploy with one click (the build output directory can be left blank).
+2. **Setup Deployment**: Log in to the Cloudflare dashboard, go to Workers & Pages to connect your GitHub account, and select the forked repository.
+3. **Build Command**: During the deployment configuration, make sure to enter `pnpm run build:frontend` as the Build command, then deploy with one click (the build output directory can be left blank).
+4. **Access the App**: After successful deployment, you can access it via the default domain `https://cloudssh.<your-subdomain>.workers.dev`.
+5. **Bind Custom Domain** (Optional): In the Cloudflare Dashboard Workers settings, go to "Triggers" → "Custom Domains" to add your domain.
 
 #### Method 2: Local CLI Deployment
 
@@ -182,17 +183,17 @@ This project implements a complete SSH-2.0 protocol stack:
 
 Once deployed, Wrangler will output your Worker URL. Open that URL in your browser to start using your Web SSH terminal.
 
+5. **Bind Custom Domain** (Optional): In the Cloudflare Dashboard Workers settings, go to "Triggers" → "Custom Domains" to add your domain.
+
 #### Optional: Configure Turnstile Human Verification
 
 To prevent malicious bot abuse, it is recommended to enable Cloudflare Turnstile verification:
 
 1. **Create Turnstile Widget**: Log in to [Cloudflare Dashboard](https://dash.cloudflare.com/), go to the Turnstile page and create a new Widget.
 2. **Get Keys**: After creation, you will receive a **Site Key** (public) and a **Secret Key** (private).
-3. **Configure Environment Variables**:
-   - **Method 1 (GitHub)**: In the Cloudflare Dashboard Workers settings, add the following environment variables:
-     - `TURNSTILE_SECRET` = your Secret Key
-     - `TURNSTILE_SITEKEY` = your Site Key
-   - **Method 2 (CLI)**: Uncomment `TURNSTILE_SECRET` and `TURNSTILE_SITEKEY` in `wrangler.toml` and enter your keys.
+3. **Configure Environment Variables**: In the Cloudflare Dashboard Workers settings, go to "Settings" → "Variables and Secrets", add the following environment variables:
+   - `TURNSTILE_SECRET` = your Secret Key (Type: Secret)
+   - `TURNSTILE_SITEKEY` = your Site Key (Type: Text)
 4. **Redeploy**: Run the deployment command to apply the configuration.
 
 > **Note**: Turnstile verification is session-level. After verification, all features are available for the current session. Closing the browser will require re-verification.
@@ -208,21 +209,12 @@ With GitHub OAuth enabled, users can log in with their GitHub account and save/m
    - **Authorization callback URL**: `https://your-domain.com/api/auth/callback`
    - After creation, note the **Client ID**, then click **Generate a new client secret** to get the **Client Secret** (shown only once, save it immediately)
 
-2. **Configure Environment Variables**:
-   - **Method 1 (GitHub)**: In the Cloudflare Dashboard Workers settings, add:
-     - `GITHUB_CLIENT_ID` = your Client ID
-     - `BASE_URL` = `https://your-domain.com` (your deployed domain)
-   - **Method 2 (CLI)**: Uncomment `GITHUB_CLIENT_ID` and `BASE_URL` in `wrangler.toml` and enter your values.
+2. **Configure Environment Variables**: In the Cloudflare Dashboard Workers settings, go to "Settings" → "Variables and Secrets", add the following environment variables:
+   - `GITHUB_CLIENT_ID` = your Client ID (Type: Text)
+   - `BASE_URL` = `https://your-domain.com` (your deployed domain, Type: Text)
+   - `GITHUB_CLIENT_SECRET` = your Client Secret (Type: Secret)
 
-3. **Set Secrets (Sensitive Information)**:
-   - After deploying the project, go to Cloudflare Dashboard → your Worker project (`cloudssh`) → **Settings** → **Variables and Secrets**.
-   - Click **Add** under Environment Variables:
-     - **Type**: Select **Secret** (Important: Do not select Text)
-     - **Variable name**: `GITHUB_CLIENT_SECRET`
-     - **Value**: Paste your Client Secret
-   - Click **Save and deploy**.
-
-4. **Redeploy**: If you just added the variables and are enabling the feature for the first time, you must delete the old deployment and redeploy to initialize the database.
+3. **Redeploy**: If you just added the variables and are enabling the feature for the first time, you must delete the old deployment and redeploy to initialize the database.
 
 > **Note**: Server credentials (passwords/private keys) are encrypted with AES-256-GCM before storage. The local encryption key is automatically generated and safely stored in the database (you can also manually override it by setting `SESSION_SECRET` in environment variables). During connection, credentials never pass through the frontend — they are securely transmitted via a one-time-token mechanism.
 
