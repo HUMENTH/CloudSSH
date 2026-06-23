@@ -128,7 +128,6 @@ export class SSHSession {
         } else {
           const result = await reader.read();
           if (result.done) {
-            console.log('[SSH] Socket closed (EOF)');
             this.sendError('SSH 服务器断开连接 (Socket closed by remote)');
             this.close();
             break;
@@ -172,19 +171,16 @@ export class SSHSession {
               versionFound = true;
               break;
             } else {
-              // console.log('[SSH] Pre-version banner: ' + lineStr);
             }
           }
 
           if (versionFound) {
             this.versionRawBuffer = new Uint8Array(0);
-            // console.log('[SSH] Version exchange complete, remote=' + this.transport.getRemoteVersion());
             this.sendStatus('版本交换完成，正在密钥协商...');
             this.state = 'kex';
             await this.startKEX();
 
             if (remaining.length > 0) {
-              // console.log('[SSH] Remaining data after version: ' + remaining.length + ' bytes');
               this.packetParser.feed(remaining);
               await this.processPackets();
             }
@@ -194,14 +190,12 @@ export class SSHSession {
             }
           }
         } else {
-          // console.log('[SSH] Received ' + value.length + ' bytes, state=' + this.state);
           this.packetParser.feed(value);
           await this.processPackets();
         }
       }
     } catch (error) {
       const errMsg = error instanceof Error ? error.message : String(error);
-      console.error('[SSH] Read loop error:', errMsg, error instanceof Error ? error.stack : '');
       try {
         this.ws.send(JSON.stringify({ type: 'error', message: 'SSH 连接异常: ' + errMsg }));
       } catch {}
@@ -209,14 +203,12 @@ export class SSHSession {
   }
 
   private async startKEX(): Promise<void> {
-    // console.log('[KEX] Starting key exchange');
     this.kexInitLocal = KEXInitBuilder.build();
 
     const packet = await SSHPacketBuilder.build(
       this.kexInitLocal, 8, null, this.seqNumSend++
     );
     await this.writeSocket(packet);
-    // console.log('[KEX] KEXINIT sent');
   }
 
   private async sendKEXECDHInit(): Promise<void> {
@@ -243,7 +235,6 @@ export class SSHSession {
       kexInit, 8, null, this.seqNumSend++
     );
     await this.writeSocket(ecdhPacket);
-    // console.log(`[KEX] ECDH_INIT sent using ${this.negotiatedKexAlgorithm}, waiting for server reply`);
   }
 
   private async writeSocket(data: Uint8Array): Promise<void> {
@@ -780,13 +771,8 @@ export class SSHSession {
     new DataView(serviceRequest.buffer).setUint32(1, nameBytes.length, false);
     serviceRequest.set(nameBytes, 5);
 
-    // console.log('[AUTH] SERVICE_REQUEST payload len=' + serviceRequest.length + ', seqNum=' + this.seqNumSend);
-    // console.log('[AUTH] encryptCipher exists=' + !!this.encryptCipher);
-
     const packet = await this.buildEncryptedPacket(serviceRequest);
-    // console.log('[AUTH] Encrypted packet len=' + packet.length + ', first16=' + Array.from(packet.slice(0, 16)).map(b => b.toString(16).padStart(2, '0')).join(''));
     await this.writeSocket(packet);
-    // console.log('[AUTH] SERVICE_REQUEST sent to socket');
   }
 
   private async authenticate(): Promise<void> {
@@ -830,7 +816,6 @@ export class SSHSession {
         break;
 
       case SSH_MSG_UNIMPLEMENTED:
-        console.warn('[AUTH] Server sent UNIMPLEMENTED');
         break;
     }
   }
@@ -1010,11 +995,8 @@ export class SSHSession {
     } catch {}
   }
 
-  private sendDebug(message: string): void {
-    // console.log('[DEBUG] ' + message);
-    // try {
-    //   this.ws.send(JSON.stringify({ type: 'status', message: '[DEBUG] ' + message }));
-    // } catch {}
+  private sendDebug(_message: string): void {
+    // 调试日志已禁用
   }
 
   close(normal: boolean = false): void {

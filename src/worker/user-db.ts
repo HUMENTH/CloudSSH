@@ -130,7 +130,6 @@ export class UserDBDO {
       return Response.json({ error: 'Not Found' }, { status: 404 });
     } catch (e) {
       const msg = e instanceof Error ? e.message : String(e);
-      console.error('[UserDBDO] Error:', msg);
       return Response.json({ error: msg }, { status: 500 });
     }
   }
@@ -471,7 +470,6 @@ export class UserDBDO {
         crypto.getRandomValues(bytes);
         secret = Array.from(bytes).map(b => b.toString(16).padStart(2, '0')).join('');
         this.db.exec("INSERT INTO system_config (key, value) VALUES ('session_secret', ?)", secret);
-        console.log('[UserDBDO] Auto-generated and stored a new SESSION_SECRET');
       }
     }
 

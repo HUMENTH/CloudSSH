@@ -197,7 +197,6 @@ export class SSHSessionDO {
 
     } catch (error) {
       const errMsg = error instanceof Error ? error.message : String(error);
-      console.error('[SSH] Session error:', errMsg);
       try {
         ws.send(JSON.stringify({ type: 'error', message: `连接失败: ${errMsg}` }));
         ws.close(1011, 'SSH connection failed');
