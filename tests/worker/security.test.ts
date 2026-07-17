@@ -246,6 +246,18 @@ describe('安全 — SSRF 接缝（AI base_url）', () => {
         return new Response('{}', { status: 500 });
       }),
     });
+    // DoH responses for validateBaseUrlWithDNS (api.example.com → public IP)
+    fetchMock.mockResolvedValueOnce(
+      new Response(JSON.stringify({ Answer: [{ type: 1, data: '93.184.216.34' }] }), {
+        headers: { 'Content-Type': 'application/dns-json' },
+      })
+    );
+    fetchMock.mockResolvedValueOnce(
+      new Response(JSON.stringify({ Answer: [] }), {
+        headers: { 'Content-Type': 'application/dns-json' },
+      })
+    );
+    // Models endpoint returns redirect (should be blocked by redirect: 'manual')
     fetchMock.mockResolvedValueOnce(new Response(null, {
       status: 302,
       headers: { Location: 'http://127.0.0.1/models' },
@@ -514,23 +526,6 @@ describe('安全 — 速率限制', () => {
 });
 
 describe('安全 — SSH 身份字段信任边界', () => {
-  it('匿名配置同时剥离 userId 与 githubId', async () => {
-    const { stripUntrustedIdentity } = await import('../../src/worker/durable-object');
-    const config = {
-      host: 'example.com',
-      port: 22,
-      username: 'alice',
-      password: 'secret',
-      userId: '12',
-      githubId: '987',
-    };
-
-    stripUntrustedIdentity(config);
-
-    expect(config).not.toHaveProperty('userId');
-    expect(config).not.toHaveProperty('githubId');
-  });
-
   it('Agent 使用 githubId 定位分片并用 userId 查询配置', async () => {
     const { SSHSession } = await import('../../src/worker/ssh-session');
     const idFromName = vi.fn(() => 'do-userdb-987');

@@ -1,10 +1,6 @@
 import { Env, SSHConnectionConfig, TerminalSize, normalizeTerminalSize } from '../types';
 import { SSHSession } from './ssh-session';
-
-export function stripUntrustedIdentity(config: SSHConnectionConfig): void {
-  delete config.userId;
-  delete config.githubId;
-}
+import { checkHostResolved } from './dns-check';
 
 /**
  * SSRF 防护：检测目标主机是否为内网、保留或特殊地址。
@@ -77,24 +73,12 @@ export class SSHSessionDO {
       }
     } else {
       const headerConfig = request.headers.get('x-ssh-config');
-      const paramConfig = url.searchParams.get('config');
 
       if (headerConfig) {
         try {
           prefilledConfig = JSON.parse(decodeURIComponent(headerConfig)) as SSHConnectionConfig;
-          // 来自 Worker 内部可信头的配置，保留 userId
         } catch {
           return new Response('Invalid config header', { status: 400 });
-        }
-      } else if (paramConfig) {
-        try {
-          prefilledConfig = JSON.parse(decodeURIComponent(paramConfig)) as SSHConnectionConfig;
-          // 来自 URL 的匿名配置，必须剥离身份字段防止提权伪造
-          if (prefilledConfig && typeof prefilledConfig === 'object') {
-            stripUntrustedIdentity(prefilledConfig);
-          }
-        } catch {
-          return new Response('Invalid config parameter', { status: 400 });
         }
       }
     }
@@ -248,6 +232,11 @@ export class SSHSessionDO {
       // --- SSRF Protection ---
       if (isBlockedHost(config.host)) {
         throw new Error('禁止连接内网或保留地址 (SSRF 防护)');
+      }
+      // DNS rebinding defence: resolve hostname and check resolved IPs
+      const dnsCheck = await checkHostResolved(config.host);
+      if (dnsCheck.blocked) {
+        throw new Error(dnsCheck.reason!);
       }
       const BLOCKED_PORTS = [
         23, 80, 443, 25, 465, 587, 110, 143, 993, 995,
