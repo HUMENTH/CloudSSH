@@ -44,7 +44,7 @@
 </head>
 <body class="min-h-screen font-body text-sm">
   <div id="app">
-    <!-- Login Page (匿名连接) -->
+    <!-- Login Page (Anonymous Connection) -->
     <div id="auth-section" class="min-h-screen flex items-center justify-center p-6 relative overflow-y-auto">
       <div class="scanlines"></div>
       <div class="flicker"></div>
@@ -67,7 +67,7 @@
       </main>
     </div>
 
-    <!-- User Space Page (登录后) -->
+    <!-- User Space Page (After logging in) -->
     <div id="user-space-section" class="hidden min-h-screen flex-col bg-elevated text-on-surface">
       <!-- TopAppBar -->
       <header class="flex justify-between items-center w-full px-6 h-16 bg-elevated border-b border-outline-variant z-50">
@@ -76,7 +76,7 @@
         </div>
         <div class="flex items-center gap-4 flex-wrap">
           <div id="user-info" class="flex items-center gap-3">
-            <!-- 动态渲染：头像 + 用户名 -->
+            <!-- Dynamic rendering: avatar + username -->
           </div>
           <button id="ai-config-btn" class="hover:opacity-80 transition-opacity cursor-pointer p-1 flex items-center justify-center" title="AI Agent Settings">
             <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">psychology</span>
@@ -91,7 +91,7 @@
       <main class="flex-1 p-6 relative overflow-auto custom-scrollbar">
         <div class="scanlines pointer-events-none"></div>
         <div class="max-w-5xl mx-auto">
-          <!-- 顶部操作栏 -->
+          <!-- Top action bar -->
           <div class="flex justify-between items-center mb-6">
             <div>
               <h2 class="text-lg font-bold text-primary tracking-[0.1em]">SERVER_LIST</h2>
@@ -102,11 +102,11 @@
               ADD_SERVER
             </button>
           </div>
-          <!-- 服务器卡片网格 -->
+          <!-- Server card grid -->
           <div id="server-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            <!-- 由 JS 动态渲染 -->
+            <!-- Dynamically rendered by JS -->
           </div>
-          <!-- 空状态 -->
+          <!-- Empty state -->
           <div id="empty-state" class="hidden flex-col items-center justify-center py-20">
             <span class="material-symbols-outlined text-dim mb-4" style="font-size: 64px; font-variation-settings: 'FILL' 0;">dns</span>
             <p class="text-muted text-sm tracking-[0.1em] mb-2">NO_SERVERS_CONFIGURED</p>
@@ -128,7 +128,7 @@
       </footer>
     </div>
 
-    <!-- Server Modal (添加/编辑) -->
+    <!-- Server Modal (Add/Edit) -->
     <div id="server-modal" class="hidden fixed inset-0 z-[100] flex items-center justify-center">
       <div class="modal-overlay absolute inset-0" id="modal-backdrop"></div>
       <div class="cyber-box p-6 shadow-2xl relative z-10 w-full max-w-md mx-4">
@@ -183,13 +183,13 @@
               </div>
             </div>
             <div id="modal-key-section" style="display:none;">
-              <textarea id="server-private-key" class="terminal-input text-[11px] w-full" rows="4" placeholder="-----BEGIN OPENSSH PRIVATE KEY-----&#10;...粘贴私钥内容...&#10;-----END OPENSSH PRIVATE KEY-----" style="resize:vertical;border:1px solid var(--border-strong);padding:8px;"></textarea>
+              <textarea id="server-private-key" class="terminal-input text-[11px] w-full" rows="4" placeholder="-----BEGIN OPENSSH PRIVATE KEY-----&#10;...Paste the private key content...&#10;-----END OPENSSH PRIVATE KEY-----" style="resize:vertical;border:1px solid var(--border-strong);padding:8px;"></textarea>
             </div>
           </div>
           <div>
             <label class="block text-xs font-bold tracking-[0.1em] text-muted mb-2">REGION_HINT</label>
             <select id="server-region" class="terminal-input text-[13px] cursor-pointer" style="border:1px solid var(--border-strong);border-bottom:1px solid var(--border-strong);padding:6px 8px;">
-              <option value="">自动（保存时由系统推断）</option>
+              <option value="">Automatic (inferred by the system when saving)</option>
             </select>
             <div id="server-region-inferred" class="text-[10px] text-muted mt-1"></div>
           </div>
@@ -238,10 +238,10 @@
         </div>
       </header>
 
-      <!-- Tab Bar（标签栏） -->
+      <!-- Tab Bar -->
       <div id="tab-bar" class="flex items-center bg-background border-b border-outline-variant px-2 h-9 overflow-x-auto custom-scrollbar gap-0.5"
            style="scrollbar-width: thin;">
-        <!-- 由 TabManager 动态渲染标签 -->
+        <!-- Tabs dynamically rendered by TabManager -->
         <button id="new-tab-btn" class="tab-new-btn" title="New Connection">
           <span class="material-symbols-outlined" style="font-size:16px;">add</span>
         </button>
@@ -263,7 +263,7 @@
               <span id="term-info"></span>
             </div>
           </div>
-          <!-- Terminal Area (TabManager 在此动态创建每个标签的容器) -->
+          <!-- Terminal Area (TabManager dynamically creates a container for each tab here) -->
           <div id="terminal-area" class="flex-1 overflow-hidden relative"></div>
         </div>
       </main>
