@@ -67,7 +67,7 @@ function initTerminalTab(): void {
     return;
   }
 
-  // 隐藏所有非终端元素
+  // Hide all non-terminal elements
   document.getElementById('auth-section')!.classList.add('hidden');
   document.getElementById('user-space-section')!.classList.add('hidden');
   document.getElementById('user-space-section')!.classList.remove('flex');
@@ -161,7 +161,7 @@ function showOfflineUI(): void {
     return;
   }
 
-  // 如果还有其他标签，不回到连接页
+  // If there are still active tabs, don't go back to connection page
   if (tabManager && tabManager.hasAnyTab()) {
     return;
   }
@@ -183,7 +183,7 @@ function showOfflineUI(): void {
   document.getElementById('status-text')!.innerHTML = '<span class="w-2 h-2 bg-surface-dot inline-block"></span> STATUS: OFFLINE';
 }
 
-/** 在终端页面创建新标签并显示终端视图 */
+/** Create a new tab on the terminal page and show the terminal view */
 function showTerminalWithNewTab(
   label: string,
   displayLabel: string,
@@ -282,7 +282,7 @@ document.getElementById('export-btn')?.addEventListener('click', () => {
 const CUSTOM_THEME_VALUE = '__custom__';
 const themeSelector = document.getElementById('theme-selector') as HTMLSelectElement | null;
 
-/** 获取一个可用于主题操作的终端实例（当前活跃标签的终端） */
+/** Get a terminal instance for theme operations (the terminal of the currently active tab) */
 function getThemeTerminal(): SSHTerminal | null {
   return tabManager?.getActiveTab()?.terminal || null;
 }

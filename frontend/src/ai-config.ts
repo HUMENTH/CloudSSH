@@ -41,7 +41,7 @@ export class AIConfigPanel {
               <span class="text-muted mr-2">&gt;</span>
               <input id="ai-base-url" class="terminal-input text-[13px]" placeholder="https://api.openai.com/v1" type="url" required>
             </div>
-            <div class="text-[10px] text-muted opacity-60 mt-1">OpenAI / DeepSeek / 通义千问 / Kimi / OpenRouter 等兼容接口</div>
+            <div class="text-[10px] text-muted opacity-60 mt-1">OpenAI / DeepSeek / Qwen / Kimi / OpenRouter compatible APIs</div>
           </div>
           <div>
             <label class="block text-xs font-bold tracking-[0.1em] text-muted mb-2">API_KEY</label>
@@ -49,7 +49,7 @@ export class AIConfigPanel {
               <span class="material-symbols-outlined text-muted mr-2" style="font-size:16px;">key</span>
               <input id="ai-api-key" class="terminal-input text-[13px]" placeholder="sk-..." type="password">
             </div>
-            <div id="ai-key-hint" class="text-[10px] text-muted opacity-60 mt-1">留空 = 不修改现有 Key</div>
+            <div id="ai-key-hint" class="text-[10px] text-muted opacity-60 mt-1">Leave empty = keep existing Key unchanged</div>
           </div>
           <div>
             <label class="block text-xs font-bold tracking-[0.1em] text-muted mb-2">MODEL</label>
@@ -92,7 +92,7 @@ export class AIConfigPanel {
           if (baseUrlEl) baseUrlEl.value = data.base_url || '';
           if (modelEl) modelEl.value = data.model || '';
           if (hintEl && data.api_key_last4) {
-            hintEl.textContent = `当前 Key: ****${data.api_key_last4}（留空 = 不修改）`;
+            hintEl.textContent = `Current Key: ****${data.api_key_last4} (leave empty = keep unchanged)`;
           }
         }
       }
@@ -110,12 +110,12 @@ export class AIConfigPanel {
     const apiKey = apiKeyEl?.value.trim();
 
     if (!baseUrl || !apiKey) {
-      this.showFetchStatus('请先填写 Base URL 和 API Key', true);
+      this.showFetchStatus('Please fill in Base URL and API Key first', true);
       return;
     }
 
     if (fetchBtn) fetchBtn.disabled = true;
-    this.showFetchStatus('获取模型列表中...');
+    this.showFetchStatus('Fetching models...');
 
     try {
       const res = await fetch('/api/ai/models', {
@@ -133,7 +133,7 @@ export class AIConfigPanel {
 
       if (data.fallback && data.models?.length === 0) {
         const reason = data.reason ? ` (${data.reason})` : '';
-        this.showFetchStatus(`Provider 不支持自动获取${reason}，请手动输入模型名称`, false);
+        this.showFetchStatus(`Provider does not support automatic fetching${reason}, please enter model name manually`, false);
         return;
       }
 
@@ -146,7 +146,7 @@ export class AIConfigPanel {
           modelListEl.appendChild(option);
         }
       }
-      this.showFetchStatus(`获取到 ${models.length} 个模型`, false);
+      this.showFetchStatus(`Fetched ${models.length} models`, false);
     } catch (e) {
       this.showFetchStatus('获取失败: ' + (e instanceof Error ? e.message : '网络错误'), true);
     } finally {
