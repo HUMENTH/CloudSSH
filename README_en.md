@@ -193,7 +193,7 @@ This project implements a complete SSH-2.0 protocol stack:
 #### Method 1: Deploy via GitHub Integration (Recommended)
 
 <div align="center">
-  <a href="https://dash.cloudflare.com/?url=https://github.com/newbietan/CloudSSH">
+  <a href="https://deploy.workers.cloudflare.com/?url=https://github.com/newbietan/CloudSSH">
     <img src="https://img.shields.io/badge/Deploy_to_Cloudflare-FF6633?style=for-the-badge&logo=cloudflare&logoColor=white" alt="Deploy to Cloudflare">
   </a>
   <p>Click the button to jump to the Cloudflare console — authorize your GitHub account and deploy automatically, no local environment required</p>

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="en-IN">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -1411,9 +1411,9 @@
                     </div>
                   </div>
                   <div class="login-field">
-                    <label>REGION_HINT <span style="font-size:8px;opacity:0.6;font-weight:400">(可选)</span></label>
+                    <label>REGION_HINT <span style="font-size:8px;opacity:0.6;font-weight:400">(Optional)</span></label>
                     <div class="input-line" style="border-bottom:1px solid var(--border-strong);padding-bottom:6px;justify-content:space-between">
-                      <span class="placeholder-text">自动（保存时由系统推断）</span>
+                      <span class="placeholder-text">Automatic (inferred by the system when saving)</span>
                       <span class="material-symbols-outlined" style="font-size:12px;color:var(--text-muted)">expand_more</span>
                     </div>
                   </div>
@@ -1524,7 +1524,7 @@
                 <!-- Server Modal Preview -->
                 <div class="us-section-header" style="margin-top:16px">
                   <div>
-                    <h2>ADD_SERVER <span style="font-size:10px;color:var(--text-muted);font-weight:400">(弹窗预览)</span></h2>
+                    <h2>ADD_SERVER <span style="font-size:10px;color:var(--text-muted);font-weight:400">(Popup Preview)</span></h2>
                   </div>
                 </div>
                 <div style="background:var(--bg-surface);border:1px solid var(--border-strong);border-radius:8px;padding:16px;position:relative">
@@ -1574,7 +1574,7 @@
                   <div class="login-field">
                     <label>REGION_HINT</label>
                     <div class="input-line" style="border-bottom:1px solid var(--border-strong);padding-bottom:6px;justify-content:space-between">
-                      <span class="placeholder-text">自动（保存时由系统推断）</span>
+                      <span class="placeholder-text">Automatic (inferred by the system when saving)</span>
                       <span class="material-symbols-outlined" style="font-size:12px;color:var(--text-muted)">expand_more</span>
                     </div>
                   </div>
@@ -1745,7 +1745,7 @@
             <div class="agent-messages">
               <!-- User Message -->
               <div class="agent-msg-user">
-                <span class="agent-msg-text">帮我检查服务器的配置信息</span>
+                <span class="agent-msg-text">Help me check the server's configuration information</span>
                 <span class="material-symbols-outlined agent-icon-user" style="font-variation-settings:'FILL' 1">person</span>
               </div>
               <!-- Thinking Process Container (Collapsed) -->
@@ -1753,28 +1753,28 @@
                 <div class="tp-header">
                   <span class="material-symbols-outlined tp-chevron">expand_more</span>
                   <span class="material-symbols-outlined tp-icon" style="font-variation-settings:'FILL' 1">check_circle</span>
-                  <span class="tp-status-text">已完成 5 个步骤</span>
+                  <span class="tp-status-text">5 steps completed</span>
                 </div>
               </div>
               <!-- Agent Response (Markdown) -->
               <div class="agent-msg-agent">
                 <span class="material-symbols-outlined agent-icon-bot" style="font-variation-settings:'FILL' 1">smart_toy</span>
                 <div class="agent-response-body">
-                  <h3>服务器配置信息汇总</h3>
+                  <h3>Server Configuration Info Summary</h3>
                   <table class="agent-table">
-                    <tr><th>项目</th><th>值</th></tr>
-                    <tr><td>操作系统</td><td>Ubuntu 24.04.4 LTS</td></tr>
-                    <tr><td>内核版本</td><td>Linux 6.8.0 x86_64</td></tr>
+                    <tr><th>Item</th><th>Value</th></tr>
+                    <tr><td>Operating system</td><td>Ubuntu 24.04.4 LTS</td></tr>
+                    <tr><td>Kernel version</td><td>Linux 6.8.0 x86_64</td></tr>
                     <tr><td>CPU</td><td>1 vCPU @ 2494 MHz</td></tr>
-                    <tr><td>内存</td><td>512 MiB (45% used)</td></tr>
+                    <tr><td>Memory</td><td>512 MiB (45% used)</td></tr>
                   </table>
-                  <p>建议定期执行 <code class="agent-code">apt update && apt upgrade</code></p>
+                  <p>It's recommended to do it regularly<code class="agent-code">apt update && apt upgrade</code></p>
                 </div>
               </div>
             </div>
             <!-- Input Area -->
             <div class="agent-input-bar">
-              <textarea class="agent-input" placeholder="描述你想做的事..." readonly>描述你想做的事...</textarea>
+              <textarea class="agent-input" placeholder="Describe what you want to do..." readonly>Describe what you want to do...</textarea>
               <button class="agent-send-btn">
                 <span class="material-symbols-outlined" style="font-size:14px">arrow_upward</span>
               </button>

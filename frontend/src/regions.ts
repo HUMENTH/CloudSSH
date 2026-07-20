@@ -1,11 +1,11 @@
 /**
- * DO locationHint 区域选项共享数据。
+ * DO locationHint region options share data.
  *
- * `value` 直接对应 Cloudflare DO 的 locationHint 值。
- * `value = ''` 表示 "Auto"（不留 hint，由 Cloudflare 默认调度；
- *   保存服务器时 user-db 会通过 ipapi.co 自动推断并持久化 hint）。
+ * `value` directly corresponds to the locationHint value in Cloudflare DO.
+ * `value = ''` means 'Auto' (no hint is left, Cloudflare handles scheduling by default);
+ * When saving the server, the user-db will automatically infer and persist the hint through ipapi.co.
  *
- * 参考: https://developers.cloudflare.com/durable-objects/reference/data-location/
+ * Reference: https://developers.cloudflare.com/durable-objects/reference/data-location/
  */
 export interface RegionOption {
   value: string;
@@ -13,7 +13,7 @@ export interface RegionOption {
 }
 
 export const REGION_OPTIONS: RegionOption[] = [
-  { value: '', label: '自动（保存时由系统推断）' },
+  { value: '', label: 'Automatic (inferred by the system when saving)' },
   { value: 'wnam', label: 'North America — West' },
   { value: 'enam', label: 'North America — East' },
   { value: 'sam', label: 'South America' },
@@ -28,15 +28,15 @@ export const REGION_OPTIONS: RegionOption[] = [
 ];
 
 /**
- * 根据 locationHint 值返回友好标签（用于状态栏、编辑回显等只读场景）。
+ * Returns a friendly label based on the locationHint value (for read-only scenarios like the status bar, edit echo, etc.).
  */
 export function regionLabel(value: string | null | undefined): string {
-  if (!value) return '自动';
+  if (!value) return 'Automatic';
   return REGION_OPTIONS.find(o => o.value === value)?.label || value;
 }
 
 /**
- * 构造一个填充好 option 列表的 `<select>` 元素。
+ * Build a `<select>` element with a filled-in options list.
  */
 export function populateRegionSelect(
   el: HTMLSelectElement,

@@ -1,7 +1,7 @@
 {
   "name": "cloudssh",
-  "version": "1.1.0",
-  "description": "纯 Cloudflare 架构 Web SSH 工具",
+  "version": "1.0.9",
+  "description": "Pure Cloudflare Architecture Web SSH Tool",
   "main": "src/worker/index.ts",
   "scripts": {
     "dev": "node scripts/build-html.js && wrangler dev",

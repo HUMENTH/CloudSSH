@@ -193,7 +193,7 @@ flowchart TB
 #### 方式一：通过 GitHub 绑定自动部署（推荐）
 
 <div align="center">
-  <a href="https://dash.cloudflare.com/?url=https://github.com/newbietan/CloudSSH">
+  <a href="https://deploy.workers.cloudflare.com/?url=https://github.com/newbietan/CloudSSH">
     <img src="https://img.shields.io/badge/Deploy_to_Cloudflare-FF6633?style=for-the-badge&logo=cloudflare&logoColor=white" alt="Deploy to Cloudflare">
   </a>
   <p>点击按钮跳转至 Cloudflare 控制台，授权 GitHub 后即可自动完成部署（无需本地环境）</p>

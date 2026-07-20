@@ -1,11 +1,11 @@
 # AGENTS.md
 <!-- 
-  维护提醒：当以下文件变更时请同步更新此文档：
-  - wrangler.toml (Durable Objects、环境变量、路由)
-  - src/worker/index.ts (API 路由、入口逻辑)
-  - scripts/build-html.js (构建流程)
-  - package.json (依赖、脚本命令)
-  - src/types.ts (Env 接口、类型定义)
+  Maintenance reminder: Please update this document when the following files change:
+  - wrangler.toml (Durable Objects, environment variables, routes)
+  - src/worker/index.ts (API routes, entry logic)
+  - scripts/build-html.js (build process)
+  - package.json (dependencies, script commands)
+  - src/types.ts (Env interface, type definitions)
 -->
 
 ## Project Overview
@@ -158,44 +158,44 @@ pnpm test
 
 Test files should be in `tests/` directory with `.test.ts` extension.
 
-## Git 工作流规范
+## Git Workflow Guidelines
 
-**禁止创建特性分支（feature branch）。** 所有变更必须直接提交到 `test` 分支，保持仓库分支结构整洁。
-
-```
-test 分支（开发/测试）  ──合并──>  main 分支（生产）
-```
-
-### 提交流程
-
-1. 切换到 `test` 分支：`git checkout test`
-2. 拉取最新代码：`git pull origin test`
-3. 进行开发并本地测试
-4. 直接提交到 `test` 分支并推送：`git push origin test`
-5. 测试通过后，维护者将 `test` 合并到 `main`
-
-### 提交信息规范
-
-遵循 Conventional Commits 格式，描述使用中文：
+**Creating feature branches is prohibited.** All changes must be committed directly to the `test` branch to keep the repository branch structure clean.
 
 ```
-<type>: <中文描述>
-
-feat: 添加新功能
-fix: 修复某个问题
-refactor: 重构某模块
-perf: 性能优化
-docs: 文档更新
-chore: 构建/配置变更
-ci: CI/CD 变更
+test branch (development/testing)  ──merge──>  main branch (production)
 ```
 
-### 分支用途
+### Commit Process
 
-| 分支 | 用途 | 可直接推送 |
-|------|------|-----------|
-| `test` | 所有开发、测试、PR 合入 | ✅ |
-| `main` | 生产环境，仅通过 test 合入 | ❌（保护分支） |
+1. Switch to `test` branch: `git checkout test`
+2. Pull latest code: `git pull origin test`
+3. Develop and test locally
+4. Commit directly to `test` branch and push: `git push origin test`
+5. After tests pass, maintainers merge `test` into `main`
+
+### Commit Message Conventions
+
+Follow Conventional Commits format with English descriptions:
+
+```
+<type>: <English description>
+
+feat: Add new feature
+fix: Fix an issue
+refactor: Refactor a module
+perf: Performance optimization
+docs: Documentation update
+chore: Build/configuration changes
+ci: CI/CD changes
+```
+
+### Branch Purposes
+
+| Branch | Purpose | Direct Push Allowed |
+|--------|---------|---------------------|
+| `test` | All development, testing, PR merges | ✅ |
+| `main` | Production environment, only merged from test | ❌ (protected branch) |
 
 ## Common Pitfalls
 
@@ -211,67 +211,67 @@ ci: CI/CD 变更
 
 ## Deployment Notes
 
-### 双环境部署
+### Dual Environment Deployment
 
-项目支持 production 和 test 两个独立环境同时运行在 Cloudflare 上：
+The project supports two independent environments (production and test) running simultaneously on Cloudflare:
 
-| 环境 | Worker 名称 | 分支 | 域名 |
-|------|------------|------|------|
-| Production | `cloudssh` | `main` | `<name>.workers.dev` + 自定义域名 |
-| Test | `cloudssh-test` | `test` | `<name>-test.workers.dev` + 自定义域名 |
+| Environment | Worker Name | Branch | Domain |
+|-------------|-------------|--------|--------|
+| Production | `cloudssh` | `main` | `<name>.workers.dev` + custom domain |
+| Test | `cloudssh-test` | `test` | `<name>-test.workers.dev` + custom domain |
 
-两个环境的 Durable Objects（SSHSessionDO、UserDBDO）数据完全隔离。
+The Durable Objects (SSHSessionDO, UserDBDO) data is completely isolated between the two environments.
 
-### 部署方式
+### Deployment Methods
 
-**方式一：Cloudflare Dashboard（推荐）**
-1. 构建前端：`pnpm run build:frontend`
-2. 进入 Cloudflare Dashboard → Workers
-3. 创建/选择 worker（production 用 `cloudssh`，test 用 `cloudssh-test`）
-4. 上传构建产物或通过 Git 集成自动部署
-5. 在 Settings → Variables 中配置环境变量和 DO 绑定
-6. 如需自定义域名，在 Settings → Domains & Routes 中绑定
+**Method 1: Cloudflare Dashboard (Recommended)**
+1. Build frontend: `pnpm run build:frontend`
+2. Go to Cloudflare Dashboard → Workers
+3. Create/select worker (`cloudssh` for production, `cloudssh-test` for test)
+4. Upload build artifacts or enable Git integration for automatic deployment
+5. Configure environment variables and DO bindings in Settings → Variables
+6. Bind custom domain in Settings → Domains & Routes if needed
 
-**方式二：Wrangler CLI**
+**Method 2: Wrangler CLI**
 ```bash
-pnpm run deploy          # 部署 production
-pnpm run deploy:test     # 部署 test 环境
+pnpm run deploy          # Deploy production
+pnpm run deploy:test     # Deploy test environment
 ```
 
-**方式三：GitHub Actions（CI/CD）**
-- `test` 分支 push → 自动部署到 `cloudssh-test`
-- `main` 分支 push → 自动部署到 `cloudssh`
+**Method 3: GitHub Actions (CI/CD)**
+- `test` branch push → Auto-deploy to `cloudssh-test`
+- `main` branch push → Auto-deploy to `cloudssh`
 
-### 自定义域名
+### Custom Domains
 
-`wrangler.toml` 中不硬编码自定义域名（开源项目，每人域名不同）。默认使用 Cloudflare 提供的 `workers.dev` 域名。如需绑定自定义域名：
-- 在 Cloudflare Dashboard → Workers → 你的 Worker → Settings → Domains & Routes 中添加
-- 或在 `wrangler.toml` 中添加 `[[routes]]` 配置（仅本地使用，勿提交到仓库）
+Custom domains are not hardcoded in `wrangler.toml` (open source project, different users have different domains). By default, it uses the Cloudflare-provided `workers.dev` domain. To bind a custom domain:
+- Add it in Cloudflare Dashboard → Workers → Your Worker → Settings → Domains & Routes
+- Or add `[[routes]]` configuration in `wrangler.toml` (for local use only, do not commit to repository)
 
-### Secrets 配置
+### Secrets Configuration
 
-通过 Cloudflare Dashboard 或 wrangler CLI 设置：
+Set via Cloudflare Dashboard or wrangler CLI:
 - `GITHUB_CLIENT_ID` / `GITHUB_CLIENT_SECRET` - GitHub OAuth
-- `TURNSTILE_SECRET` / `TURNSTILE_SITEKEY` - Bot 验证
-- `BASE_URL` - OAuth 回调地址（需与实际域名一致）
+- `TURNSTILE_SECRET` / `TURNSTILE_SITEKEY` - Bot verification
+- `BASE_URL` - OAuth callback URL (must match actual domain)
 
-Dashboard: Workers → 你的 Worker → Settings → Variables → Environment Variables
+Dashboard: Workers → Your Worker → Settings → Variables → Environment Variables
 CLI: `npx wrangler secret set <SECRET_NAME>`
 
-### 首次部署注意
+### First Deployment Notes
 
-- 新 Durable Objects 首次部署：先删除旧 worker 再重新部署（`npx wrangler delete <worker-name>`）
-- Test 环境 DO 绑定与 production 相同的 class_name，但因 Worker 名称不同，数据完全隔离
+- For new Durable Objects first deployment: delete old worker first then redeploy (`npx wrangler delete <worker-name>`)
+- Test environment DO binds the same class_name as production, but data is completely isolated due to different Worker names
 
-## AI 版本发布与文档维护规范
+## AI Version Release and Documentation Maintenance Guidelines
 
-在辅助人类进行版本升级和发布时，AI 助手必须严格遵守以下规范：
+When assisting humans with version upgrades and releases, AI assistants must strictly follow these guidelines:
 
-1. **版本信息流转（由人类主导，AI 辅助更新）**：
-   - 严禁 AI 助手自主决定或递增版本号。
-   - 当需要发布新版本时，根据人类指定的版本号，AI 应在本地修改：
-     - `package.json` 中的 `"version": "X.Y.Z"`。
-     - `CHANGELOG.md` 头部追加最新的更新日志（格式需为 `## [X.Y.Z] - YYYY-MM-DD`）。
-   - 必须遵循 [Keep a Changelog](https://keepachangelog.com/) 规范组织内容。
-2. **README 导航链接维护**：
-   - `README.md` 中的 `更新日志` 链接与 `README_en.md` 中的 `Changelog` 跳转超链接必须保持正常。
+1. **Version Information Flow (Human-led, AI-assisted updates)**:
+   - AI assistants are strictly prohibited from autonomously deciding or incrementing version numbers.
+   - When a new version needs to be released, based on the version number specified by humans, AI should locally modify:
+     - `"version": "X.Y.Z"` in `package.json`.
+     - Append the latest changelog at the beginning of `CHANGELOG.md` (format should be `## [X.Y.Z] - YYYY-MM-DD`).
+   - Content must be organized following the [Keep a Changelog](https://keepachangelog.com/) specification.
+2. **README Navigation Link Maintenance**:
+   - The `Changelog` link in `README.md` and the `Changelog` jump hyperlink in `README_en.md` must remain functional.
